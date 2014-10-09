@@ -53,7 +53,6 @@ class GoBackNSender {
 	        // Initialize base and nextseqnum to zero
 		    base = 0;
 		    nextseqnum = 0;
-		    System.out.println("Base at hello: " + base);
 	    } catch (Exception e) {
 			System.out.println("Sender error creating socket");
 			System.out.print(e);
@@ -126,44 +125,30 @@ class GoBackNSender {
 			sendData(nextseqnum, message.charAt(charCounter));
 			charCounter++;
 		}
-		System.out.println("nextseqnum: " + nextseqnum);
         // Then start a loop that iterates until the entire message is received
 		while(charCounter < message.length()) {
 			// Within the loop, first wait for an ACK using receiveAck(timeout)
 			try {
 				// After the ACK, update base and send new packets as appropriate
-				System.out.println("base: " + base);
 				byte b = receiveAck(TIMEOUT);
 				if (b <= base+N) {
 					sendData(nextseqnum, message.charAt(charCounter));
 					base = b;
 					base++;
 					nextseqnum++;
-					/*if (nextseqnum == BYTE_MIN) {
-						nextseqnum = 0;
-					}*/
-					System.out.println("sent data for " + nextseqnum + " char: " + message.charAt(charCounter));
 					charCounter++;
 				}
-				System.out.println("b: " + b);
 			} catch (Exception e) {
 				// If receiveAck() times out, catch the exception and retransmit
-				System.out.println("caught exception");
+				System.out.print("Retransmitting ");
 				charCounter = charCounter - (nextseqnum - base);
 				nextseqnum = base;
 				for (int i = 0; i < N; i++) {
-					/*if (nextseqnum == BYTE_MIN) {
-						nextseqnum = 0;
-					}*/
 					sendData(nextseqnum, message.charAt(charCounter));
 					charCounter++;
 					nextseqnum++;
 				}
 			}
-/*
-			if (base == BYTE_MIN) {
-				base = 0;
-			}*/
 		}
 	}
 	
