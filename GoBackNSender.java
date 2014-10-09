@@ -27,7 +27,6 @@ class GoBackNSender {
 
 	// Timeout
 	private final int TIMEOUT = 50;
-	private final byte BYTE_MIN = -128;
 	
 	/**
 	 * Creates a GoBackNSender and connects to the specified port number on 
