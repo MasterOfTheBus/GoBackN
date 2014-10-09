@@ -46,7 +46,6 @@ class GoBackNReceiver {
         // If it's a Hello, initialize expectedseqnum to 0
         // Send an ACK back to the sender using the sendAck() method
         // Call the receiveMessage() method to receive the message
-		System.out.println("Running");
 	    byte[] receiveData = new byte[1024];
 	    DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 	    try {
@@ -79,20 +78,19 @@ class GoBackNReceiver {
         // Send the appropriate ACK to the sender
 	    GoBackNPacket gbnPacket = receivePacket();
 	    while(!gbnPacket.isGoodbye()) {
-	    	System.out.println("expected: " + expectedseqnum);
 			if (gbnPacket.getSequenceNumber() == expectedseqnum) {
 			    System.out.print(gbnPacket.getValue());
 			    sendAck(expectedseqnum);
 			    expectedseqnum++;
-			    if (expectedseqnum == -128) {
-			    	expectedseqnum = 0;
-			    }
 			} else {
-			    sendAck(expectedseqnum);
+				byte errorseqnum = expectedseqnum;
+				errorseqnum--;
+			    sendAck(errorseqnum);
 			}
 			gbnPacket = receivePacket();
 	    }
 	    receiverSocket.close();
+		System.out.println("\nSender closed the connection\n\n");
 	}
 	
 	/**
@@ -136,7 +134,7 @@ class GoBackNReceiver {
 	 */
 	public static void main(String args[]) {
 		while (true) {
-			GoBackNReceiver receiver = new GoBackNReceiver(7345);//9876);
+			GoBackNReceiver receiver = new GoBackNReceiver(9876);
 		}
 	}
 }
