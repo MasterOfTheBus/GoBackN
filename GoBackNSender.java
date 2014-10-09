@@ -121,7 +121,7 @@ class GoBackNSender {
 		// STEP 5: Implement the main part of the Go-Back-N sender
         // First send one window's worth of packets
 		int charCounter = 0;
-		for (; nextseqnum < N; nextseqnum++) {
+ 		for (; nextseqnum < N; nextseqnum++) {
 			sendData(nextseqnum, message.charAt(charCounter));
 			charCounter++;
 		}
@@ -141,9 +141,13 @@ class GoBackNSender {
 			} catch (Exception e) {
 				// If receiveAck() times out, catch the exception and retransmit
 				System.out.print("Retransmitting ");
-				charCounter = charCounter - (nextseqnum - base);
+				byte diff = (byte)(nextseqnum - base);
+				charCounter = charCounter - (diff);
 				nextseqnum = base;
 				for (int i = 0; i < N; i++) {
+					if (charCounter >= message.length()) {
+					    break;
+					}
 					sendData(nextseqnum, message.charAt(charCounter));
 					charCounter++;
 					nextseqnum++;
