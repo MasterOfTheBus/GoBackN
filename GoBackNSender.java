@@ -134,13 +134,14 @@ class GoBackNSender {
 				// After the ACK, update base and send new packets as appropriate
 				System.out.println("base: " + base);
 				byte b = receiveAck(TIMEOUT);
-				if (b == base) {
+				if (b <= base+N) {
+					sendData(nextseqnum, message.charAt(charCounter));
+					base = b;
 					base++;
 					nextseqnum++;
-					if (nextseqnum == BYTE_MIN) {
+					/*if (nextseqnum == BYTE_MIN) {
 						nextseqnum = 0;
-					}
-					sendData(nextseqnum, message.charAt(charCounter));
+					}*/
 					System.out.println("sent data for " + nextseqnum + " char: " + message.charAt(charCounter));
 					charCounter++;
 				}
@@ -148,18 +149,21 @@ class GoBackNSender {
 			} catch (Exception e) {
 				// If receiveAck() times out, catch the exception and retransmit
 				System.out.println("caught exception");
+				charCounter = charCounter - (nextseqnum - base);
 				nextseqnum = base;
-				for (; nextseqnum < N; nextseqnum++) {
-					if (nextseqnum == BYTE_MIN) {
+				for (int i = 0; i < N; i++) {
+					/*if (nextseqnum == BYTE_MIN) {
 						nextseqnum = 0;
-					}
+					}*/
 					sendData(nextseqnum, message.charAt(charCounter));
 					charCounter++;
+					nextseqnum++;
 				}
 			}
+/*
 			if (base == BYTE_MIN) {
 				base = 0;
-			}
+			}*/
 		}
 	}
 	
@@ -195,7 +199,7 @@ class GoBackNSender {
 	
 		// Instantiate a new GoBackNSender which connects to address
 		// 'localhost' on port 9876
-		GoBackNSender gbnSender = new GoBackNSender("localhost", 7345);//9876);
+		GoBackNSender gbnSender = new GoBackNSender("localhost", 9876);
 		
 		// Send the message
 		gbnSender.send(message);
